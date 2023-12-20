@@ -10,6 +10,10 @@
     <link rel="stylesheet" href="css/style.css">
     <script src="keys.js"></script>
     <script>
+        let ncmb = new NCMB(appKey, clientKey);
+        let Timerdata = ncmb.DataStore("TimerdateTest");
+        let key = "lap";
+
    // timer処理
     $(function(){
         setInterval(function(){
@@ -22,15 +26,12 @@
         $('#date').click(function(e) {
             setDebugMode(e);
         });
-      
         $('#btnA').click(function(e) {
             btnAClick(e);
         });
-
         $('#btnB').click(function(e) {
             btnBClick(e);
         });
-
         $('#btnC').click(function(e) {
             btnCClick(e);
         });
@@ -40,12 +41,10 @@
     function rgbToColor(r,g,b){
         return "#" + hex02(r)+hex02(g)+hex02(b);
     }
-    
     function hex02(x) {
         var str = "0"+x.toString(16);
         return str.substring(str.length-2);
     }
-    
     function decS2(x) {
         if (x<10) {
             return "&nbsp;"+x.toString(10);
@@ -53,12 +52,10 @@
             return x.toString(10);
         }
     }
-    
     function dec02(x) {
         var str = "0"+x.toString(10);
         return str.substring(str.length-2);        
     }
-
     var debug = false;
     // Statusがクリックされた時の処理
     function setDebugMode(e){
@@ -67,10 +64,10 @@
     }
         // 変数宣言
     var active = false;
-    var startTime = 0;
+    var startTime;
     var period = 0;
     var rest = 0;
-    var etime = 0;
+    let etime = 0;
 
     // ボタンの初期設定
     function init(){
@@ -83,75 +80,29 @@
        // ButtonAがクリックされた時の処理
     function btnAClick(e){
         active = true;
-        startTime = new Date(); 
-
+        startTime = Date.now(); 
         $("#btnA").prop("disabled",true);
-        
-        
     }
-
     // ButtonBがクリックされた時の処理
     function btnBClick(e){
         active = false;
-        
-        
+        $("#btnA").prop("disabled",false);
     }
-
-    // ButtonCがクリックされた時の処理
-    function btnCClick(e){
-        alarm();
-        active = false;
-        period = 60*parseInt($("#minute").val())+parseInt($("#second").val());
-        $("#time").html("経過時間: 0");
-        $("#remain").html("残り時間:"+ period);
-        
-    }
-    
  
     // 繰り返し実行する処理
     function timer(){  
         if(active){
             etime = parseInt((new Date()- startTime)/1000);
             rest = period - etime;
-
-            var m = parseInt(rest/60);
-            var s = parseInt(rest - m*60);
-
-            $("#time").html("経過時間:"+ etime + "秒");
-            $("#remain").html("残り時間:"+ rest +"秒"+"（"+ m +"分" + s + "秒）");
-            analog(rest);
-
-            if(rest <= 0){
-                active=false;
-                alarm();
-            }
-
-            var mstr ="分:";
-            for(var i = m; i>=0; i--){
-             mstr += "〇";
-            }
-            $("#minuteStr").html(mstr);
-            var setr ="秒:";
-            for(var x = s; x>=0; x--){
-             setr += "〇";
-            }
-            $("#secondStr").html(setr);
- 
-
-        }
-        
-        
+            //var m = parseInt(rest/60);
+            //var s = parseInt(rest - m*60);
+            $("#time").html("経過時間:"+ etime);
+        }    
     } 
-
-
-        
-        let ncmb = new NCMB(appKey, clientKey);
-        let Timerdata = ncmb.DataStore("TimerdateTest");
-        let key = "lap";
 
         function enterData() {
             let timerdata = new Timerdata();
-            let value = parseInt($("#data").val());
+            let value = etime;
             timerdata.set(key, value)
                 .save()
                 .then(function(results) {
@@ -203,25 +154,6 @@
                 })
         }
 
-        function countData() {
-            
-            Timerdata.fetchAll()
-                .then(function(results) {
-                    let msg = "";
-                    for (let i = 0; i < results.length; i++) {
-                        msg += results[i].get(key) + "<br>";
-                    }
-                    $("#display").removeClass();
-                    $("#display").addClass("text-light");
-                    $("#display").addClass("bg-primary");
-                    $("#display").html(msg);
-                })
-                .catch(function(error) {
-                    $("#display").removeClass();
-                    $("#display").addClass("bg-warning");
-                    $("#display").html("delete fail:" + JSON.stringify(error));
-                })
-        }
 
         function deleteData() {
             Timerdata.fetch().then(function(results) {
@@ -260,36 +192,23 @@
 </head>
 
 <body>
-    <h1 class="text-light bg-secondary">mbaas update</h1>
+        
+    <div id="time"> TIME：</div>
+    <button id="btnA">Start</button>  
+    <button id="btnB">Stop</button>  
+
     <div>
-        <input type="text" id="data" placeholder="lap">
         <a onclick="enterData()" class="btn btn-outline-secondary" role="button">Enter</a>
     </div>
     <div>
         <a onclick="fetchAll()" class="btn btn-outline-secondary" role="buton">Fetch All</a>
         <a onclick="sortData()" class="btn btn-outline-secondary" role="button">Sort</a>
-        <a onclick="countData()" class="btn btn-outline-primary" role="button">Count</a>
         <a onclick="deleteData()" class="btn btn-outline-secondary" role="buton">Delete</a>
     </div>
     
-    <div>
-        <input type="text" id="update" placeholder="更新">
-        <a onclick="updateData()" class="btn btn-outline-secondary" role="button">Update</a>
-    </div>
     <div id="display" class="text-light bg-info">
         Results
     </div>
-
-      <div id="minuteStr">〇</div>
-    <div id="secondStr">〇</div>
-
-    <div id="remain">Remaining time</div>
-    <div id="time">Time</div>
-    <button id="btnA">ButtonA</button>  
-    <button id="btnB">ButtonB</button>  
-    <button id="btnC">ButtonC</button>  
-    <input type="number" id="minute" value=3 >
-    <input type="number" id="second" value=0 >
 </body>
 
 </html>

@@ -11,13 +11,13 @@
     <script src="keys.js"></script>
     <script>
         let ncmb = new NCMB(appKey, clientKey);
-        let UTdata = ncmb.DataStore("UpdateTest");
-        let key = "score";
+        let Timerdata = ncmb.DataStore("TimerdateTest");
+        let key = "lap";
 
         function enterData() {
-            let uTdata = new UTdata();
+            let timerdata = new Timerdata();
             let value = parseInt($("#data").val());
-            uTdata.set(key, value)
+            timerdata.set(key, value)
                 .save()
                 .then(function(results) {
                     $("#display").removeClass();
@@ -32,7 +32,7 @@
         }
 
         function fetchAll() {
-            UTdata.fetchAll()
+            Timerdata.fetchAll()
                 .then(function(results) {
                     let msg = "";
                     for (let i = 0; i < results.length; i++) {
@@ -51,7 +51,7 @@
         }
 
         function sortData() {
-            UTdata.order(key,true).fetchAll().then(function(results) {
+            Timerdata.order(key,true).fetchAll().then(function(results) {
                 let msg = "";
                 for (let i = 0; i < results.length; i++) {
                     msg += results[i].get(key) + "<br>";
@@ -69,11 +69,27 @@
         }
 
         function countData() {
-            $("#display").html("count does not work");
+            
+            Timerdata.fetchAll()
+                .then(function(results) {
+                    let msg = "";
+                    for (let i = 0; i < results.length; i++) {
+                        msg += results[i].get(key) + "<br>";
+                    }
+                    $("#display").removeClass();
+                    $("#display").addClass("text-light");
+                    $("#display").addClass("bg-primary");
+                    $("#display").html(msg);
+                })
+                .catch(function(error) {
+                    $("#display").removeClass();
+                    $("#display").addClass("bg-warning");
+                    $("#display").html("delete fail:" + JSON.stringify(error));
+                })
         }
 
         function deleteData() {
-            UTdata.fetch().then(function(results) {
+            Timerdata.fetch().then(function(results) {
                 return results.delete();
             })
             .then(function(results){
@@ -89,7 +105,7 @@
         }
 
         function updateData() {
-            UTdata.fetch().then(function(results) {
+            Timerdata.fetch().then(function(results) {
                 let value = parseInt($("#data").val());
                 results.set(key,value);
                 return results.update();
@@ -111,7 +127,7 @@
 <body>
     <h1 class="text-light bg-secondary">mbaas update</h1>
     <div>
-        <input type="text" id="data" placeholder="スコア">
+        <input type="text" id="data" placeholder="lap">
         <a onclick="enterData()" class="btn btn-outline-secondary" role="button">Enter</a>
     </div>
     <div>

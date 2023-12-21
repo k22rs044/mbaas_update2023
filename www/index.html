@@ -42,8 +42,10 @@
     var active = false;
     var startTime;
     var period = 0;
-    var rest = 0;
+    //var rest = 0;
     let etime = 0;
+    //showTime.textContent = "00:00.000";
+
 
     // ボタンの初期設定
     function init(){
@@ -68,17 +70,19 @@
     // 繰り返し実行する処理
     function timer(){  
         if(active){
-            etime = parseInt((new Date()- startTime)/1000);
-            rest = period - etime;
+           // etime = parseInt((new Date()- startTime)/1000);
+           etime = Date.now()- startTime;
+           const showTime = new Date(etime).toISOString().slice(14, 23); 
+            //rest = period - etime;
             //var m = parseInt(rest/60);
             //var s = parseInt(rest - m*60);
-            $("#time").html("経過時間:"+ etime);
+            $("#time").html("経過時間:"+ showTime);
         }    
     } 
 
         function enterData() {
             let timerdata = new Timerdata();
-            let value = etime;
+            let value = showTime;
             timerdata.set(key, value)
                 .save()
                 .then(function(results) {

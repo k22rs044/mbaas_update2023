@@ -37,31 +37,7 @@
         });
         init();
     });
-    
-    function rgbToColor(r,g,b){
-        return "#" + hex02(r)+hex02(g)+hex02(b);
-    }
-    function hex02(x) {
-        var str = "0"+x.toString(16);
-        return str.substring(str.length-2);
-    }
-    function decS2(x) {
-        if (x<10) {
-            return "&nbsp;"+x.toString(10);
-        } else { 
-            return x.toString(10);
-        }
-    }
-    function dec02(x) {
-        var str = "0"+x.toString(10);
-        return str.substring(str.length-2);        
-    }
-    var debug = false;
-    // Statusがクリックされた時の処理
-    function setDebugMode(e){
-        debug = !debug;
-        $("#status").html("Debug Mode: "+debug);
-    }
+
         // 変数宣言
     var active = false;
     var startTime;
